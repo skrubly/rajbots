@@ -50,9 +50,6 @@ class Player(object):
     for card in self.cards:
       if card.number == number:
         chosen_card = card
-    if chosen_card:  
-      pass
-      #self.cards.remove(chosen_card)
     return chosen_card
 
   def play_turn(self):

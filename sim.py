@@ -2,6 +2,7 @@
 Raj simulation run
 """
 from raj import Board, Player, RandBot, MinMaxBot
+from robots import SampleBot, PatternBot
 from operator import attrgetter
 
 
@@ -21,9 +22,9 @@ def humans():
 
 def main():
 
-  scoreboard = {'RandBot': 0, 'RandBot2': 0, 'Minnie2': 0, 'RandBot3': 0}
-  for i in range(1, 10000):
-    bots = [RandBot('RandBot'), RandBot('RandBot2'), MinMaxBot('Minnie2'), RandBot('RandBot3')]
+  scoreboard = {'RandBot': 0, 'PatternBot': 0, 'RandBot2': 0}
+  for i in range(1, 100):
+    bots = [RandBot('RandBot'), PatternBot('PatternBot'), RandBot('RandBot2')]
     board = Board(bots)
     results = board.run()
     winner = max(results, key=attrgetter('score'))
