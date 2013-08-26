@@ -4,7 +4,8 @@ Unit tests for Raj
 
 from collections import defaultdict
 from operator import attrgetter
-from raj import Player, Board, RandBot
+from raj import Player, Board
+from robots.rand_bot import RandBot
 
 import unittest
 
@@ -24,6 +25,17 @@ class TestPlayer(unittest.TestCase):
     self.players = [Player(x) for x in self.names]
     debug((self.players, self.names))
     self.assertEquals(self.names, [x.name for x in self.players])
+
+  def test_held_cards(self):
+    self.player = Player('Carl')
+    debug(self.player.held_cards)
+    self.assertEquals(self.player.held_cards, range(1, 16))
+
+  def test_played_cards(self):
+    self.player = Player('Dudley')
+    self.player.cards.pop()
+    debug(self.player.played_cards)
+    self.assertEquals(self.player.played_cards, [15])
 
 
 class TestRobot(unittest.TestCase):
@@ -65,6 +77,16 @@ class TestSorting(unittest.TestCase):
     self.pile.append(self.players[1].select_card(15))
     self.pile.append(self.players[2].select_card(15))
     self.assertEqual(self.board.find_highest(self.pile), None)
+
+class TestPlay(unittest.TestCase):
+  def setUp(self):
+    self.names = ['Alice', 'Bob', 'Carl']
+    self.players = [RandBot(x) for x in self.names]
+    self.board = Board(self.players)
+
+  def test_playthrough(self):
+    self.board.run()
+    print self.board.games
 
 if __name__ == '__main__':
   DEBUG = False

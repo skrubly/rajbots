@@ -38,8 +38,21 @@ class Player(object):
   def __init__(self, name):
     self.name = name
     self.tiles = []
+    self.init_cards()
+
+  def init_cards(self):
     self.cards = [Card(x, self) for x in range(1, 16)]
-    self.winner = False
+
+  @property
+  def held_cards(self):
+    """ Returns a list of integers of the cards held by the player """
+    return [x.number for x in self.cards]
+
+  @property
+  def played_cards(self):
+    """ Returns a list of integers of cards that have been played """
+    total_cards = range(1, 16)
+    return list(set(total_cards).difference(self.held_cards))
 
   @property
   def score(self):
@@ -75,14 +88,26 @@ class Player(object):
 
 
 class Board(object):
-  def __init__(self, players):
+  def __init__(self, players, games_quantity=1):
     self.players = players
-    self.tilestack = [Tile(x) for x in TILE_VALUES]
-    self.current_tile = None
-    self.rounds = []
+    self.rounds = []  # Holds a log of each action per current game
+    self.games = []  # Holds the total round log for each game played
+    self.scoreboard = self.init_scoreboard()
+    self.game_quantity = games_quantity  # The total number of games to play
     for player in self.players:
       player.board = self
-    
+    self.tilestack = None 
+
+  @property
+  def remaining_tiles(self):
+    return [x.value for x in self.tilestack]
+
+  def init_scoreboard(self):
+    scoredict = {}
+    for player in self.players:
+      scoredict[player.name] = 0
+    return scoredict
+
   def find_lowest(self, pile):
     """ Find the lowest unique card on the pile """
     histo_dict = defaultdict(list)    
@@ -112,7 +137,10 @@ class Board(object):
     for player in self.players:
       print "\t%s: %s" % (player.name, player.score)
 
-  def run(self):
+
+  def run_game(self):
+    self.tilestack = [Tile(x) for x in TILE_VALUES]
+    self.current_tile = None
     prize_stack = []
     while self.tilestack:
       round_log = {'prize': None, 'winner': None, 'pile': None}
@@ -149,25 +177,19 @@ class Board(object):
     print "Game over! Final scores:"
     for player in self.players:
       print "%s: %s" % (player.name, player.score)
+      self.scoreboard[player.name] += player.score
     print "Log of the game:"
     for entry in self.rounds:
       print "Cards: %s Winner: %s Prize: %s" % (entry['pile'], entry['winner'], entry['prize'])
-    return self.players
+    #return self.players
+    return self.rounds
 
-
-class RandBot(Player):
-  #def __init__(self):
-  #  super(RandBot, self).__init__(name='RandBot')
-  def play_turn(self):
-    return random.choice(self.cards)
-
-class MinMaxBot(Player):
-  """ MinMax will return its smallest or largest card, depending upon the current tile """
-  def play_turn(self):
-    if self.board.current_tile.value < 0:
-      #print "LESS THAN 0: %s" %  self.cards[0]
-      return self.cards[0]
-    else:
-      #print "MORE THAN 0: %s" % self.cards[-1]
-      return self.cards[-1]
-
+  def run(self):
+    while self.game_quantity > 0:
+      self.games.append(self.run_game())
+      # Reset the players cards and tilestacks
+      for player in self.players:
+        player.init_cards()
+        player.tiles = []
+      self.rounds = []
+      self.game_quantity -= 1
