@@ -38,6 +38,7 @@ Every robot should subclass Player, and at the least should override the `play_t
   * `score` - A property that returns the sum of all of the Tiles held by the player
   * `held_cards` - A property that returns an integer list of cards the player holds
   * `played_cards` - A property that returns an integer list of cards the player has already played
+  * `board` - The Board object running the current game
 
 #### Methods
   * `select_card(card_number)` - The method used to return a Card object based on its number. `card_number` should be an integer
@@ -46,7 +47,7 @@ The Player object provides a lot of potential sources of strategy or tactical in
 
 ### The Board Object
 
-The Board object is the container for the entire game and holds all information regarding players and what has happened so far. 
+The Board object is the container for the entire game and holds all information regarding players and what has happened so far. Every Player in the game has the same Board object attached to them via the `board` property.
 
 #### Attributes
 
@@ -89,7 +90,8 @@ So -1 and 5 have already been bid on and won. To get a list of dicts of the game
 
 Here we see a list of each round in sequence, who played what, and who won the prize, along with its value.
 
-Between examining information about other players and what cards they hold, and even in how they played previously, a fairly sophisticated robot could be constructed.
+Between examining information about other players and what cards they hold, and even in how they played previously, a fairly sophisticated robot could be constructed. One of the example robots, PatternBot, shows how to find the current tile with the following code: `current_tile = self.board.current_tile`.
+
 
 
 
